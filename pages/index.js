@@ -65,7 +65,12 @@ export default function TshirtOrderApp() {
 
   // ✅ DYNAMIC STRIPE CALL
   const handleSubmit = async () => {
-    const response = await fetch("/api/create-checkout", {
+const baseUrl =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : window.location.origin;
+
+const response = await fetch(`${baseUrl}/api/create-checkout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
