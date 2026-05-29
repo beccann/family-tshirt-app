@@ -65,6 +65,8 @@ export default function TshirtOrderApp() {
 
   // ✅ DYNAMIC STRIPE CALL
   const handleSubmit = async () => {
+    alert("Button clicked");
+    
 const baseUrl =
   window.location.hostname === "localhost"
     ? "http://localhost:3000"
