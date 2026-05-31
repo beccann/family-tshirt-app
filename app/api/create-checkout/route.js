@@ -23,17 +23,11 @@ export async function POST(req) {
         },
       ],
 
-      metadata: {
-        name: data.name || "",
-        email: data.email || "",
-        size: data.size || "",
-        type: data.type || "",
-        tall: data.isTall ? "Yes" : "No",
-        personalizationName: data.personalizationName || "",
-        personalizationNumber: data.personalizationNumber || "",
-        personalizationWings: data.personalizationWings ? "Yes" : "No",
-        quantity: (data.quantity || 1).toString()
-      },
+     metadata: {
+  name: data.name || "",
+  email: data.email || "",
+  shirts: JSON.stringify(data.shirts)
+},
 
       success_url: data.successUrl,
       cancel_url: data.cancelUrl
