@@ -64,14 +64,9 @@ export default function TshirtOrderApp() {
   const total = calculateTotal();
 
   // ✅ DYNAMIC STRIPE CALL
-  const handleSubmit = async () => {
-    
-const baseUrl =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3000"
-    : window.location.origin;
-
-const response = await fetch(`${baseUrl}/api/create-checkout`, {
+const handleSubmit = async () => {
+  try {
+    const response = await fetch("/api/create-checkout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -79,14 +74,30 @@ const response = await fetch(`${baseUrl}/api/create-checkout`, {
       body: JSON.stringify({
         ...form,
         total,
-        successUrl: window.location.origin + "/success",
+        successUrl: window.location.origin,
         cancelUrl: window.location.href
       })
     });
 
+    if (!response.ok) {
+      alert("Request failed: " + response.status);
+      return;
+    }
+
     const data = await response.json();
+
+    if (!data.url) {
+      alert("No Stripe URL returned");
+      return;
+    }
+
     window.location.href = data.url;
-  };
+
+  } catch (error) {
+    console.error(error);
+    alert("Error occurred — check console");
+  }
+};
 
   return (
     <div style={{ maxWidth: "500px", margin: "auto", padding: "20px" }}>
