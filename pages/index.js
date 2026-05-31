@@ -115,9 +115,11 @@ export default function TshirtOrderApp() {
         fontFamily: "Arial"
       }}
     >
-      <h1>🎉 Family Reunion T-Shirt Order</h1>
+      {/* ✅ UPDATED TITLE */}
+      <h1>🏕️ Cooper Campout T-Shirt Order</h1>
 
-      <h3>Customer Info</h3>
+      {/* ✅ UPDATED LABEL */}
+      <h3>Submitter Info</h3>
 
       <div style={{ marginBottom: "15px" }}>
         <input
