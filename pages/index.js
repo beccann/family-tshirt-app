@@ -97,7 +97,15 @@ export default function TshirtOrderApp() {
         email: customer.email,
         shirts,
         total,
-        successUrl: window.location.origin,
+        successUrl:
+  window.location.origin +
+  "/success?name=" +
+  encodeURIComponent(customer.name) +
+  "&total=" +
+  total +
+  "&shirts=" +
+  encodeURIComponent(JSON.stringify(shirts)),
+
         cancelUrl: window.location.href
       })
     });
