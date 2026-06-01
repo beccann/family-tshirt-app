@@ -4,10 +4,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { email, total } = body;
+    const { email, total } = await req.json();
 
     const amount = Math.round(Number(total) * 100);
+
+    if (!amount || amount <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Invalid amount" }),
+        { status: 400 }
+      );
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -35,13 +41,16 @@ export async function POST(req) {
       cancel_url: "https://family-tshirt-app.vercel.app"
     });
 
-    return Response.json({ url: session.url });
+    return new Response(
+      JSON.stringify({ url: session.url }),
+      { status: 200 }
+    );
 
   } catch (error) {
     console.error("Stripe error:", error);
 
-    return Response.json(
-      { error: "Checkout failed" },
+    return new Response(
+      JSON.stringify({ error: "Checkout failed" }),
       { status: 500 }
     );
   }
