@@ -6,6 +6,14 @@ export default async function handler(req, res) {
   try {
     const { name, email, shirts, total, successUrl, cancelUrl } = req.body;
 
+    // ✅ Just log the order so you don't lose it
+    console.log("ORDER:", {
+      name,
+      email,
+      shirts,
+      total
+    });
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -23,11 +31,10 @@ export default async function handler(req, res) {
         }
       ],
 
-      // ✅ THIS IS THE IMPORTANT PART
+      // ✅ IMPORTANT: SMALL metadata only (this fixes your crash)
       metadata: {
         name: name,
-        email: email,
-        shirts: JSON.stringify(shirts)
+        email: email
       },
 
       customer_email: email,
