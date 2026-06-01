@@ -11,6 +11,12 @@ export async function POST(req) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
+      metadata: {
+  name: data.name || "",
+  email: data.email || "",
+  shirts: JSON.stringify(data.shirts || [])
+},
+
       // ✅ THIS is the fix (use this instead)
       payment_method_types: ["card"],
 
