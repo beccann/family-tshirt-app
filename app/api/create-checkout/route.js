@@ -1,14 +1,17 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16"
+});
 
 export default async function handler(req, res) {
   try {
     const { name, email, shirts, total, successUrl, cancelUrl } = req.body;
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
       mode: "payment",
+
+      automatic_payment_methods: { enabled: true },
 
       line_items: [
         {
