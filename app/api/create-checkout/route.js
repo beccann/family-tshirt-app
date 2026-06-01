@@ -11,10 +11,13 @@ export async function POST(req) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
+      customer_email: data.email,
+
       metadata: {
-        name: data.name || "",
-        email: data.email || "",
-        shirts: JSON.stringify(data.shirts || [])
+        name: data.name,
+        email: data.email,
+        shirts: JSON.stringify(data.shirts),
+        total: String(data.total)
       },
 
       payment_method_types: ["card"],
@@ -24,15 +27,13 @@ export async function POST(req) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "Campout T-Shirt Order"
+              name: "Cooper Campout T-Shirt Order"
             },
             unit_amount: amount
           },
           quantity: 1
         }
       ],
-
-      customer_email: data.email,
 
       success_url: data.successUrl,
       cancel_url: data.cancelUrl
@@ -43,8 +44,6 @@ export async function POST(req) {
     });
 
   } catch (error) {
-    console.error(error);
-
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500
     });
