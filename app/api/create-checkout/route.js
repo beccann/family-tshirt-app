@@ -4,10 +4,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const data = await req.json(); // ✅ FIX
-    const { email, total } = data;
+    const data = await req.json();
 
-    const amount = Math.round(Number(total) * 100);
+    const amount = Math.round(Number(data.total) * 100);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -33,10 +32,10 @@ export async function POST(req) {
         }
       ],
 
-      customer_email: email,
+      customer_email: data.email,
 
-      success_url: "https://family-tshirt-app.vercel.app/success",
-      cancel_url: "https://family-tshirt-app.vercel.app"
+      success_url: data.successUrl,
+      cancel_url: data.cancelUrl
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
@@ -51,3 +50,4 @@ export async function POST(req) {
     });
   }
 }
+``
