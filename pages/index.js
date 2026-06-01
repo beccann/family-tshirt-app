@@ -86,54 +86,31 @@ export default function TshirtOrderApp() {
     setShirts(updated);
   };
 
-  // ✅ FIXED SUBMIT FUNCTION (NO BIG URL DATA)
+  // ✅ CLEAN, MATCHED SUBMIT FUNCTION
   const handleSubmit = async () => {
     try {
-      if (!customer.name || !customer.email) {
-        alert("Please enter your name and email.");
-        return;
-      }
-
-      console.log("Submitting order...");
-
-      const response = await fetch("/api/create-checkout", {
+      const res = await fetch("/api/create-checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          name: customer.name,
           email: customer.email,
-          shirts,
-          total,
-          successUrl:
-            window.location.origin +
-            "/success?name=" +
-            encodeURIComponent(customer.name) +
-            "&total=" +
-            total,
-          cancelUrl: window.location.href
+          total: total
         })
       });
 
-      if (!response.ok) {
-        throw new Error("Server error");
-      }
+      const data = await res.json();
 
-      const data = await response.json();
-
-      console.log("Response:", data);
-
-      if (!data.url) {
-        alert("Checkout failed. Please try again.");
+      if (!res.ok) {
+        alert(data.error || "Checkout failed");
         return;
       }
 
       window.location.href = data.url;
 
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Checkout failed. Please try again.");
+    } catch (err) {
+      alert("Something broke: " + err.message);
     }
   };
 
@@ -184,114 +161,47 @@ export default function TshirtOrderApp() {
         >
           <h3>Shirt #{index + 1}</h3>
 
-          <div style={{ marginBottom: "10px" }}>
-            <select
-              value={shirt.size}
-              onChange={(e) => updateShirt(index, "size", e.target.value)}
-              style={{ width: "100%", padding: "8px" }}
-            >
-              <optgroup label="Youth Sizes">
-                <option>Youth XS</option>
-                <option>Youth S</option>
-                <option>Youth M</option>
-                <option>Youth L</option>
-              </optgroup>
+          <select
+            value={shirt.size}
+            onChange={(e) => updateShirt(index, "size", e.target.value)}
+            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+          >
+            <option>Adult S</option>
+            <option>Adult M</option>
+            <option>Adult L</option>
+            <option>Adult XL</option>
+            <option>2XL</option>
+            <option>3XL</option>
+            <option>4XL</option>
+            <option>5XL</option>
+          </select>
 
-              <optgroup label="Adult Sizes">
-                <option>Adult S</option>
-                <option>Adult M</option>
-                <option>Adult L</option>
-                <option>Adult XL</option>
-                <option>2XL</option>
-                <option>3XL</option>
-                <option>4XL</option>
-                <option>5XL</option>
-              </optgroup>
-            </select>
-          </div>
+          <select
+            value={shirt.type}
+            onChange={(e) => updateShirt(index, "type", e.target.value)}
+            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+          >
+            <option>Cotton</option>
+            <option>Ladies Cotton</option>
+            <option>Soft Feel</option>
+            <option>Dry Fit</option>
+          </select>
 
-          <div style={{ marginBottom: "10px" }}>
-            <select
-              value={shirt.type}
-              onChange={(e) => updateShirt(index, "type", e.target.value)}
-              style={{ width: "100%", padding: "8px" }}
-            >
-              <option>Cotton</option>
-              <option>Ladies Cotton</option>
-              <option>Soft Feel</option>
-              <option>Dry Fit</option>
-            </select>
-          </div>
-
-          <div style={{ marginBottom: "10px" }}>
-            <label style={{ display: "flex", gap: "8px" }}>
-              <input
-                type="checkbox"
-                checked={shirt.isTall}
-                onChange={(e) =>
-                  updateShirt(index, "isTall", e.target.checked)
-                }
-              />
-              Tall
-            </label>
-          </div>
-
-          <div style={{ marginBottom: "10px" }}>
-            <input
-              placeholder="Name on Shirt"
-              value={shirt.personalizationName}
-              onChange={(e) =>
-                updateShirt(index, "personalizationName", e.target.value)
-              }
-              style={{ width: "100%", padding: "8px" }}
-            />
-          </div>
-
-          <div style={{ marginBottom: "10px" }}>
-            <input
-              placeholder="Number on Shirt"
-              value={shirt.personalizationNumber}
-              onChange={(e) =>
-                updateShirt(index, "personalizationNumber", e.target.value)
-              }
-              style={{ width: "100%", padding: "8px" }}
-            />
-          </div>
-
-          <div style={{ marginBottom: "10px" }}>
-            <label style={{ display: "flex", gap: "8px" }}>
-              <input
-                type="checkbox"
-                checked={shirt.personalizationWings}
-                onChange={(e) =>
-                  updateShirt(index, "personalizationWings", e.target.checked)
-                }
-              />
-              Add Angel Wings
-            </label>
-          </div>
-
-          <div style={{ marginBottom: "10px" }}>
-            <input
-              type="number"
-              min="1"
-              value={shirt.quantity}
-              onChange={(e) =>
-                updateShirt(index, "quantity", parseInt(e.target.value) || 1)
-              }
-              style={{ width: "100%", padding: "8px" }}
-            />
-          </div>
+          <input
+            type="number"
+            min="1"
+            value={shirt.quantity}
+            onChange={(e) =>
+              updateShirt(index, "quantity", parseInt(e.target.value) || 1)
+            }
+            style={{ width: "100%", padding: "8px" }}
+          />
         </div>
       ))}
 
       <button
         onClick={addShirt}
-        style={{
-          marginBottom: "20px",
-          padding: "10px",
-          width: "100%"
-        }}
+        style={{ marginBottom: "20px", padding: "10px", width: "100%" }}
       >
         ➕ Add Another Shirt
       </button>
