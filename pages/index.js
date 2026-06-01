@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function TshirtOrderApp() {
   const [shirts, setShirts] = useState([
     {
-      size: "M",
+      size: "Adult M",
       type: "Cotton",
       isTall: false,
       personalizationName: "",
@@ -69,7 +69,7 @@ export default function TshirtOrderApp() {
     setShirts([
       ...shirts,
       {
-        size: "M",
+        size: "Adult M",
         type: "Cotton",
         isTall: false,
         personalizationName: "",
@@ -98,14 +98,13 @@ export default function TshirtOrderApp() {
         shirts,
         total,
         successUrl:
-  window.location.origin +
-  "/success?name=" +
-  encodeURIComponent(customer.name) +
-  "&total=" +
-  total +
-  "&shirts=" +
-  encodeURIComponent(JSON.stringify(shirts)),
-
+          window.location.origin +
+          "/success?name=" +
+          encodeURIComponent(customer.name) +
+          "&total=" +
+          total +
+          "&shirts=" +
+          encodeURIComponent(JSON.stringify(shirts)),
         cancelUrl: window.location.href
       })
     });
@@ -123,10 +122,8 @@ export default function TshirtOrderApp() {
         fontFamily: "Arial"
       }}
     >
-      {/* ✅ UPDATED TITLE */}
       <h1>🏕️ Cooper Campout T-Shirt Order</h1>
 
-      {/* ✅ UPDATED LABEL */}
       <h3>Submitter Info</h3>
 
       <div style={{ marginBottom: "15px" }}>
@@ -163,15 +160,30 @@ export default function TshirtOrderApp() {
         >
           <h3>Shirt #{index + 1}</h3>
 
+          {/* ✅ UPDATED SIZE LIST WITH YOUTH */}
           <div style={{ marginBottom: "10px" }}>
             <select
               value={shirt.size}
               onChange={(e) => updateShirt(index, "size", e.target.value)}
               style={{ width: "100%", padding: "8px" }}
             >
-              {["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"].map((s) => (
-                <option key={s}>{s}</option>
-              ))}
+              <optgroup label="Youth Sizes">
+                <option>Youth XS</option>
+                <option>Youth S</option>
+                <option>Youth M</option>
+                <option>Youth L</option>
+              </optgroup>
+
+              <optgroup label="Adult Sizes">
+                <option>Adult S</option>
+                <option>Adult M</option>
+                <option>Adult L</option>
+                <option>Adult XL</option>
+                <option>2XL</option>
+                <option>3XL</option>
+                <option>4XL</option>
+                <option>5XL</option>
+              </optgroup>
             </select>
           </div>
 
