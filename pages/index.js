@@ -86,7 +86,7 @@ export default function TshirtOrderApp() {
     setShirts(updated);
   };
 
-  // ✅ FULLY FIXED SUBMIT FUNCTION
+  // ✅ FIXED SUBMIT FUNCTION (NO BIG URL DATA)
   const handleSubmit = async () => {
     try {
       if (!customer.name || !customer.email) {
@@ -111,15 +111,13 @@ export default function TshirtOrderApp() {
             "/success?name=" +
             encodeURIComponent(customer.name) +
             "&total=" +
-            total +
-            "&shirts=" +
-            encodeURIComponent(JSON.stringify(shirts)),
+            total,
           cancelUrl: window.location.href
         })
       });
 
       if (!response.ok) {
-        throw new Error("Server returned an error");
+        throw new Error("Server error");
       }
 
       const data = await response.json();
@@ -127,11 +125,12 @@ export default function TshirtOrderApp() {
       console.log("Response:", data);
 
       if (!data.url) {
-        alert("Something went wrong starting checkout.");
+        alert("Checkout failed. Please try again.");
         return;
       }
 
       window.location.href = data.url;
+
     } catch (error) {
       console.error("Checkout error:", error);
       alert("Checkout failed. Please try again.");
@@ -314,4 +313,3 @@ export default function TshirtOrderApp() {
     </div>
   );
 }
-``
