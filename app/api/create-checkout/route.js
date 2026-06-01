@@ -4,7 +4,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const { email, total } = await req.json();
+    const data = await req.json(); // ✅ FIX
+    const { email, total } = data;
 
     const amount = Math.round(Number(total) * 100);
 
@@ -12,12 +13,11 @@ export async function POST(req) {
       mode: "payment",
 
       metadata: {
-  name: data.name || "",
-  email: data.email || "",
-  shirts: JSON.stringify(data.shirts || [])
-},
+        name: data.name || "",
+        email: data.email || "",
+        shirts: JSON.stringify(data.shirts || [])
+      },
 
-      // ✅ THIS is the fix (use this instead)
       payment_method_types: ["card"],
 
       line_items: [
@@ -39,17 +39,15 @@ export async function POST(req) {
       cancel_url: "https://family-tshirt-app.vercel.app"
     });
 
-    return new Response(
-      JSON.stringify({ url: session.url }),
-      { status: 200 }
-    );
+    return new Response(JSON.stringify({ url: session.url }), {
+      status: 200
+    });
 
   } catch (error) {
     console.error(error);
 
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500
+    });
   }
 }
