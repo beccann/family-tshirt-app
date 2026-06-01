@@ -83,14 +83,21 @@ export default function TshirtOrderApp() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        name: customer.name,
-        email: customer.email,
-        shirts: shirts,
-        total: total,
-        successUrl: window.location.origin + "/success",
-        cancelUrl: window.location.href
-      })
+     body: JSON.stringify({
+  name: customer.name,
+  email: customer.email,
+  shirts: shirts,
+  total: total,
+  successUrl:
+    window.location.origin +
+    "/success?name=" +
+    encodeURIComponent(customer.name) +
+    "&total=" +
+    total +
+    "&shirts=" +
+    encodeURIComponent(JSON.stringify(shirts)),
+  cancelUrl: window.location.href
+})
     });
 
     const data = await response.json();
