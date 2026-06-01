@@ -4,13 +4,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const body = await req.json();
+    const { email, total } = await req.json();
 
-    const amount = Math.round(Number(body.total) * 100);
+    const amount = Math.round(Number(total) * 100);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      automatic_payment_methods: { enabled: true },
+
+      // ✅ THIS is the fix (use this instead)
+      payment_method_types: ["card"],
 
       line_items: [
         {
@@ -25,21 +27,23 @@ export async function POST(req) {
         }
       ],
 
-      customer_email: body.email,
+      customer_email: email,
 
       success_url: "https://family-tshirt-app.vercel.app/success",
       cancel_url: "https://family-tshirt-app.vercel.app"
     });
 
-    return new Response(JSON.stringify({ url: session.url }), {
-      status: 200
-    });
+    return new Response(
+      JSON.stringify({ url: session.url }),
+      { status: 200 }
+    );
 
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
 
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500
-    });
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500 }
+    );
   }
 }
