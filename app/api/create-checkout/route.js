@@ -2,9 +2,9 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export async function POST(req) {
+export default async function handler(req, res) {
   try {
-    const data = await req.json();
+    const { name, email, shirts, total, successUrl, cancelUrl } = req.body;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -15,28 +15,30 @@ export async function POST(req) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "Family Reunion T-Shirt",
+              name: "Campout T-Shirt Order"
             },
-            unit_amount: Math.round(data.total * 100),
+            unit_amount: total * 100
           },
-          quantity: 1,
-        },
+          quantity: 1
+        }
       ],
 
-     metadata: {
-  name: data.name || "",
-  email: data.email || "",
-  shirts: JSON.stringify(data.shirts)
-},
+      // ✅ THIS IS THE IMPORTANT PART
+      metadata: {
+        name: name,
+        email: email,
+        shirts: JSON.stringify(shirts)
+      },
 
-      success_url: data.successUrl,
-      cancel_url: data.cancelUrl
+      customer_email: email,
+      success_url: successUrl,
+      cancel_url: cancelUrl
     });
 
-    return Response.json({ url: session.url });
+    res.status(200).json({ url: session.url });
 
   } catch (error) {
-    console.error(error);
-    return new Response("Error creating checkout", { status: 500 });
+    console.error("Stripe error:", error);
+    res.status(500).json({ error: "Failed to create checkout session" });
   }
 }
