@@ -6,14 +6,6 @@ export default async function handler(req, res) {
   try {
     const { name, email, shirts, total, successUrl, cancelUrl } = req.body;
 
-    // ✅ Just log the order so you don't lose it
-    console.log("ORDER:", {
-      name,
-      email,
-      shirts,
-      total
-    });
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -25,13 +17,12 @@ export default async function handler(req, res) {
             product_data: {
               name: "Campout T-Shirt Order"
             },
-            unit_amount: total * 100
+            unit_amount: Math.round(total * 100)
           },
           quantity: 1
         }
       ],
 
-      // ✅ IMPORTANT: SMALL metadata only (this fixes your crash)
       metadata: {
         name: name,
         email: email
@@ -44,10 +35,11 @@ export default async function handler(req, res) {
 
     res.status(200).json({ url: session.url });
 
-} catch (error) {
-  console.error("FULL ERROR:", error);
+  } catch (error) {
+    console.error("Stripe error:", error.message);
 
-  res.status(500).json({
-    error: error.message
-  });
+    res.status(500).json({
+      error: error.message || "Checkout failed"
+    });
+  }
 }
