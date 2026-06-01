@@ -18,9 +18,48 @@ export default function TshirtOrderApp() {
     email: ""
   });
 
+  const PRICING = {
+    baseCotton: 8,
+    softFeel: 3,
+    ladiesCotton: 3,
+    dryFit: 3,
+    tall: 5,
+    dryFitTall: 5,
+    size: {
+      "2XL": 2,
+      "3XL": 4,
+      "4XL": 5,
+      "5XL": 6
+    },
+    personalization: {
+      name: 6,
+      number: 6,
+      wings: 6
+    }
+  };
+
   const calculateTotal = () => {
-    return shirts.reduce((total, shirt) => {
-      return total + 8 * shirt.quantity;
+    return shirts.reduce((grandTotal, form) => {
+      let total = PRICING.baseCotton;
+
+      if (form.type === "Soft Feel") total += PRICING.softFeel;
+      if (form.type === "Ladies Cotton") total += PRICING.ladiesCotton;
+      if (form.type === "Dry Fit") total += PRICING.dryFit;
+
+      if (form.isTall) {
+        if (form.type === "Dry Fit") total += PRICING.dryFitTall;
+        else total += PRICING.tall;
+      }
+
+      if (PRICING.size[form.size]) {
+        total += PRICING.size[form.size];
+      }
+
+      if (form.personalizationName) total += PRICING.personalization.name;
+      if (form.personalizationNumber) total += PRICING.personalization.number;
+      if (form.personalizationWings) total += PRICING.personalization.wings;
+
+      return grandTotal + total * form.quantity;
     }, 0);
   };
 
@@ -51,7 +90,7 @@ export default function TshirtOrderApp() {
     console.log("SENDING:", {
       name: customer.name,
       email: customer.email,
-      shirts
+      shirts: shirts
     });
 
     const response = await fetch("/api/create-checkout", {
@@ -81,39 +120,36 @@ export default function TshirtOrderApp() {
   };
 
   return (
-    <div style={{ maxWidth: "650px", margin: "auto", padding: "20px" }}>
+    <div style={{ maxWidth: "650px", margin: "auto", padding: "20px", fontFamily: "Arial" }}>
       <h1>🏕️ Cooper Campout T-Shirt Order</h1>
 
       <h3>Submitter Info</h3>
 
-      <input
-        placeholder="Name"
-        value={customer.name}
-        onChange={(e) =>
-          setCustomer({ ...customer, name: e.target.value })
-        }
-        style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
-      />
+      <div style={{ marginBottom: "10px" }}>
+        <input
+          placeholder="Name"
+          value={customer.name}
+          onChange={(e) =>
+            setCustomer({ ...customer, name: e.target.value })
+          }
+          style={{ width: "100%", padding: "8px" }}
+        />
+      </div>
 
-      <input
-        placeholder="Email"
-        value={customer.email}
-        onChange={(e) =>
-          setCustomer({ ...customer, email: e.target.value })
-        }
-        style={{ width: "100%", marginBottom: "20px", padding: "8px" }}
-      />
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          placeholder="Email"
+          value={customer.email}
+          onChange={(e) =>
+            setCustomer({ ...customer, email: e.target.value })
+          }
+          style={{ width: "100%", padding: "8px" }}
+        />
+      </div>
 
       {shirts.map((shirt, index) => (
-        <div
-          key={index}
-          style={{
-            border: "1px solid #ccc",
-            padding: "10px",
-            marginBottom: "15px"
-          }}
-        >
-          <h4>Shirt {index + 1}</h4>
+        <div key={index} style={{ border: "1px solid #ccc", padding: "15px", marginBottom: "15px" }}>
+          <h3>Shirt {index + 1}</h3>
 
           <select
             value={shirt.size}
@@ -126,7 +162,59 @@ export default function TshirtOrderApp() {
             <option>Adult M</option>
             <option>Adult L</option>
             <option>Adult XL</option>
+            <option>2XL</option>
+            <option>3XL</option>
+            <option>4XL</option>
+            <option>5XL</option>
           </select>
+
+          <select
+            value={shirt.type}
+            onChange={(e) => updateShirt(index, "type", e.target.value)}
+          >
+            <option>Cotton</option>
+            <option>Ladies Cotton</option>
+            <option>Soft Feel</option>
+            <option>Dry Fit</option>
+          </select>
+
+          <label>
+            <input
+              type="checkbox"
+              checked={shirt.isTall}
+              onChange={(e) =>
+                updateShirt(index, "isTall", e.target.checked)
+              }
+            />
+            Tall
+          </label>
+
+          <input
+            placeholder="Name on Shirt"
+            value={shirt.personalizationName}
+            onChange={(e) =>
+              updateShirt(index, "personalizationName", e.target.value)
+            }
+          />
+
+          <input
+            placeholder="Number on Shirt"
+            value={shirt.personalizationNumber}
+            onChange={(e) =>
+              updateShirt(index, "personalizationNumber", e.target.value)
+            }
+          />
+
+          <label>
+            <input
+              type="checkbox"
+              checked={shirt.personalizationWings}
+              onChange={(e) =>
+                updateShirt(index, "personalizationWings", e.target.checked)
+              }
+            />
+            Angel Wings
+          </label>
 
           <input
             type="number"
@@ -147,3 +235,4 @@ export default function TshirtOrderApp() {
     </div>
   );
 }
+``
