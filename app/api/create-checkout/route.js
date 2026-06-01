@@ -38,10 +38,10 @@ export async function POST(req) {
     return Response.json({ url: session.url });
 
   } catch (error) {
-    console.error("STRIPE ERROR:", error);
+    console.error("Stripe error:", error);
 
     return Response.json(
-      { error: "Stripe failed" },
+      { error: "Checkout failed" },
       { status: 500 }
     );
   }
