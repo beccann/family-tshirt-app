@@ -86,31 +86,56 @@ export default function TshirtOrderApp() {
     setShirts(updated);
   };
 
+  // ✅ FULLY FIXED SUBMIT FUNCTION
   const handleSubmit = async () => {
-    const response = await fetch("/api/create-checkout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: customer.name,
-        email: customer.email,
-        shirts,
-        total,
-        successUrl:
-          window.location.origin +
-          "/success?name=" +
-          encodeURIComponent(customer.name) +
-          "&total=" +
-          total +
-          "&shirts=" +
-          encodeURIComponent(JSON.stringify(shirts)),
-        cancelUrl: window.location.href
-      })
-    });
+    try {
+      if (!customer.name || !customer.email) {
+        alert("Please enter your name and email.");
+        return;
+      }
 
-    const data = await response.json();
-    window.location.href = data.url;
+      console.log("Submitting order...");
+
+      const response = await fetch("/api/create-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: customer.name,
+          email: customer.email,
+          shirts,
+          total,
+          successUrl:
+            window.location.origin +
+            "/success?name=" +
+            encodeURIComponent(customer.name) +
+            "&total=" +
+            total +
+            "&shirts=" +
+            encodeURIComponent(JSON.stringify(shirts)),
+          cancelUrl: window.location.href
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Server returned an error");
+      }
+
+      const data = await response.json();
+
+      console.log("Response:", data);
+
+      if (!data.url) {
+        alert("Something went wrong starting checkout.");
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Checkout failed. Please try again.");
+    }
   };
 
   return (
@@ -160,7 +185,6 @@ export default function TshirtOrderApp() {
         >
           <h3>Shirt #{index + 1}</h3>
 
-          {/* ✅ UPDATED SIZE LIST WITH YOUTH */}
           <div style={{ marginBottom: "10px" }}>
             <select
               value={shirt.size}
@@ -290,3 +314,4 @@ export default function TshirtOrderApp() {
     </div>
   );
 }
+``
