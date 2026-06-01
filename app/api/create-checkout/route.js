@@ -1,17 +1,28 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16"
-});
-
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
   try {
-    const { name, email, shirts, total, successUrl, cancelUrl } = req.body;
+    const { email, total } = req.body;
+
+    // ✅ MAKE SURE TOTAL IS VALID
+    const amount = Math.round(Number(total || 0) * 100);
+
+    if (!amount || amount < 50) {
+      return res.status(400).json({
+        error: "Invalid amount"
+      });
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ["card"],
 
       line_items: [
         {
@@ -20,29 +31,25 @@ export default async function handler(req, res) {
             product_data: {
               name: "Campout T-Shirt Order"
             },
-            unit_amount: Math.round(total * 100)
+            unit_amount: amount
           },
           quantity: 1
         }
       ],
 
-      metadata: {
-        name: name,
-        email: email
-      },
-
       customer_email: email,
-      success_url: successUrl,
-      cancel_url: cancelUrl
+
+      success_url: "https://family-tshirt-app.vercel.app/success",
+      cancel_url: "https://family-tshirt-app.vercel.app"
     });
 
-    res.status(200).json({ url: session.url });
+    return res.status(200).json({ url: session.url });
 
-  } catch (error) {
-    console.error("Stripe error:", error.message);
+  } catch (err) {
+    console.error(err);
 
-    res.status(500).json({
-      error: error.message || "Checkout failed"
+    return res.status(500).json({
+      error: "Stripe failed"
     });
   }
 }
