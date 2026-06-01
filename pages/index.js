@@ -86,7 +86,7 @@ export default function TshirtOrderApp() {
     setShirts(updated);
   };
 
-  // ✅ CLEAN, MATCHED SUBMIT FUNCTION
+  // ✅ CLEAN SUBMIT (does NOT break Stripe)
   const handleSubmit = async () => {
     try {
       const res = await fetch("/api/create-checkout", {
@@ -127,27 +127,23 @@ export default function TshirtOrderApp() {
 
       <h3>Submitter Info</h3>
 
-      <div style={{ marginBottom: "15px" }}>
-        <input
-          placeholder="Full Name"
-          value={customer.name}
-          onChange={(e) =>
-            setCustomer({ ...customer, name: e.target.value })
-          }
-          style={{ width: "100%", padding: "10px" }}
-        />
-      </div>
+      <input
+        placeholder="Full Name"
+        value={customer.name}
+        onChange={(e) =>
+          setCustomer({ ...customer, name: e.target.value })
+        }
+        style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+      />
 
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          placeholder="Email"
-          value={customer.email}
-          onChange={(e) =>
-            setCustomer({ ...customer, email: e.target.value })
-          }
-          style={{ width: "100%", padding: "10px" }}
-        />
-      </div>
+      <input
+        placeholder="Email"
+        value={customer.email}
+        onChange={(e) =>
+          setCustomer({ ...customer, email: e.target.value })
+        }
+        style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+      />
 
       {shirts.map((shirt, index) => (
         <div
@@ -187,6 +183,47 @@ export default function TshirtOrderApp() {
             <option>Dry Fit</option>
           </select>
 
+          <label style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+            <input
+              type="checkbox"
+              checked={shirt.isTall}
+              onChange={(e) =>
+                updateShirt(index, "isTall", e.target.checked)
+              }
+            />
+            Tall
+          </label>
+
+          {/* ✅ PERSONALIZATION BACK */}
+          <input
+            placeholder="Name on Shirt"
+            value={shirt.personalizationName}
+            onChange={(e) =>
+              updateShirt(index, "personalizationName", e.target.value)
+            }
+            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+          />
+
+          <input
+            placeholder="Number on Shirt"
+            value={shirt.personalizationNumber}
+            onChange={(e) =>
+              updateShirt(index, "personalizationNumber", e.target.value)
+            }
+            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+          />
+
+          <label style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+            <input
+              type="checkbox"
+              checked={shirt.personalizationWings}
+              onChange={(e) =>
+                updateShirt(index, "personalizationWings", e.target.checked)
+              }
+            />
+            Add Angel Wings
+          </label>
+
           <input
             type="number"
             min="1"
@@ -201,7 +238,11 @@ export default function TshirtOrderApp() {
 
       <button
         onClick={addShirt}
-        style={{ marginBottom: "20px", padding: "10px", width: "100%" }}
+        style={{
+          marginBottom: "20px",
+          padding: "10px",
+          width: "100%"
+        }}
       >
         ➕ Add Another Shirt
       </button>
