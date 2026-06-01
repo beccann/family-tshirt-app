@@ -1,16 +1,11 @@
 import Stripe from "stripe";
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).send("Method allowed is POST only");
-  }
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2023-10-16"
-  });
-
+export async function POST(req) {
   try {
-    const { email, total } = req.body;
+    const body = await req.json();
+    const { email, total } = body;
 
     const amount = Math.round(Number(total) * 100);
 
@@ -40,15 +35,14 @@ export default async function handler(req, res) {
       cancel_url: "https://family-tshirt-app.vercel.app"
     });
 
-    return res.status(200).json({ url: session.url });
+    return Response.json({ url: session.url });
 
   } catch (error) {
-    console.error("REAL STRIPE ERROR:", error);
+    console.error("STRIPE ERROR:", error);
 
-    // ✅ THIS IS THE DIFFERENCE
-    return res.status(500).json({
-      message: error.message
-    });
+    return Response.json(
+      { error: "Stripe failed" },
+      { status: 500 }
+    );
   }
 }
-``
