@@ -1,225 +1,147 @@
-import { useState } from "react";
-
-export default function TshirtOrderApp() {
-
-  const [customer, setCustomer] = useState({
-    name: "",
-    email: ""
-  });
-
-  const [shirts, setShirts] = useState([
-    {
-      size: "Adult M",
-      type: "Cotton",
-      isTall: false,
-      personalizationName: "",
-      personalizationNumber: "",
-      personalizationWings: false,
-      quantity: 1
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cooper Campout</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
     }
-  ]);
 
-  const PRICING = {
-    baseCotton: 8,
-    dryFit: 3,
-    softFeel: 3,
-    ladiesCotton: 3,
-    tall: 5,
-    personalization: {
-      name: 6,
-      number: 6,
-      wings: 6
+    .container {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      max-width: 550px;
     }
-  };
 
-  const calculateTotal = () => {
+    h1 {
+      font-size: 2.7rem;
+      margin-bottom: 5px;
+    }
 
-    return shirts.reduce((sum, shirt) => {
+    .subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
 
-      let total = PRICING.baseCotton;
+    .tent {
+      width: 0;
+      height: 0;
+      border-left: 60px solid transparent;
+      border-right: 60px solid transparent;
+      border-bottom: 90px solid #ffcc66;
+      margin: 0 auto 25px;
+      position: relative;
+    }
 
-      if (shirt.type === "Dry Fit") total += PRICING.dryFit;
-      if (shirt.type === "Soft Feel") total += PRICING.softFeel;
-      if (shirt.type === "Ladies Cotton") total += PRICING.ladiesCotton;
+    .tent::after {
+      content: '';
+      position: absolute;
+      left: -15px;
+      top: 30px;
+      width: 30px;
+      height: 60px;
+      background: #8b5a2b;
+      border-radius: 3px;
+    }
 
-      if (shirt.isTall) total += PRICING.tall;
+    #message {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
 
-      if (shirt.personalizationName) total += PRICING.personalization.name;
-      if (shirt.personalizationNumber) total += PRICING.personalization.number;
-      if (shirt.personalizationWings) total += PRICING.personalization.wings;
+    .countdown {
+      font-size: 1.4rem;
+      margin: 20px 0;
+      font-weight: bold;
+    }
 
-      return sum + total * shirt.quantity;
-    }, 0);
+    .calendar {
+      text-align: left;
+      margin-top: 20px;
+      font-size: 0.95rem;
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 10px;
+    }
 
-  };
+    .calendar h3 {
+      margin-top: 0;
+      text-align: center;
+    }
 
-  const total = calculateTotal();
+    .calendar p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
 
-  const updateShirt = (index, field, value) => {
-    const updated = [...shirts];
-    updated[index][field] = value;
-    setShirts(updated);
-  };
+<div class="container">
+  <h1>Cooper Campout</h1>
+  <div class="subtitle">⛺ Outdoor Adventure Experience</div>
 
-  const addShirt = () => {
-    setShirts([
-      ...shirts,
-      {
-        size: "Adult M",
-        type: "Cotton",
-        isTall: false,
-        personalizationName: "",
-        personalizationNumber: "",
-        personalizationWings: false,
-        quantity: 1
-      }
-    ]);
-  };
+  <div class="tent"></div>
 
-  const handleSubmit = async () => {
+  <p id="message"></p>
 
-    const response = await fetch("/api/create-checkout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-     body: JSON.stringify({
-  name: customer.name,
-  email: customer.email,
-  shirts: shirts,
-  total: total,
-  successUrl:
-    window.location.origin +
-    "/success?name=" +
-    encodeURIComponent(customer.name) +
-    "&total=" +
-    total +
-    "&shirts=" +
-    encodeURIComponent(JSON.stringify(shirts)),
-  cancelUrl: window.location.href
-})
-    });
+  <div class="countdown" id="countdown"></div>
 
-    const data = await response.json();
-    window.location.href = data.url;
-  };
+  <div class="calendar">
+    <h3>2027 Important Dates</h3>
+    <p>🗳️ Voting Opens: April 15, 2027</p>
+    <p>🛒 Orders Open: May 1, 2027</p>
+    <p>🛑 Orders Close: May 31, 2027</p>
+    <p>🏕️ Campout: June 25–27, 2027</p>
+  </div>
+</div>
 
-  return (
-    <div style={{ maxWidth: "650px", margin: "auto", padding: "20px", fontFamily: "Arial" }}>
+<script>
+  const now = new Date();
+  const campDate = new Date("June 25, 2027 00:00:00");
 
-      <h1 style={{ textAlign: "center" }}>🏕️ Cooper Campout T-Shirt Order</h1>
+  const messageEl = document.getElementById("message");
 
-      <h3>Submitter Info</h3>
+  if (now < new Date("May 1, 2027")) {
+    messageEl.textContent = "Orders are currently closed for the season. Please come back in 2027.";
+  } else if (now <= new Date("May 31, 2027")) {
+    messageEl.textContent = "Orders are OPEN! Get yours before May 31.";
+  } else {
+    messageEl.textContent = "Orders are now closed. See you at camp!";
+  }
 
-      <input
-        placeholder="Full Name"
-        value={customer.name}
-        onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
-        style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
-      />
+  function updateCountdown() {
+    const now = new Date();
+    const diff = campDate - now;
 
-      <input
-        placeholder="Email"
-        value={customer.email}
-        onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
-        style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
-      />
+    if (diff <= 0) {
+      document.getElementById("countdown").textContent = "🎉 Campout is happening now!";
+      return;
+    }
 
-      {shirts.map((shirt, index) => (
-        <div key={index} style={{
-          border: "1px solid #ccc",
-          padding: "15px",
-          marginBottom: "20px"
-        }}>
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
 
-          <h3>Shirt #{index + 1}</h3>
+    document.getElementById("countdown").textContent =
+      `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s until Campout`;
+  }
 
-          <select
-            value={shirt.size}
-            onChange={(e) => updateShirt(index, "size", e.target.value)}
-            style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
-          >
-            <option>Youth S</option>
-            <option>Youth M</option>
-            <option>Youth L</option>
-            <option>Adult S</option>
-            <option>Adult M</option>
-            <option>Adult L</option>
-            <option>Adult XL</option>
-            <option>2XL</option>
-            <option>3XL</option>
-            <option>4XL</option>
-            <option>5XL</option>
-          </select>
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+</script>
 
-          <select
-            value={shirt.type}
-            onChange={(e) => updateShirt(index, "type", e.target.value)}
-            style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
-          >
-            <option>Cotton</option>
-            <option>Dry Fit</option>
-            <option>Soft Feel</option>
-            <option>Ladies Cotton</option>
-          </select>
-
-          <label>
-            <input
-              type="checkbox"
-              checked={shirt.isTall}
-              onChange={(e) => updateShirt(index, "isTall", e.target.checked)}
-            /> Tall
-          </label>
-
-          <input
-            placeholder="Name on Shirt"
-            value={shirt.personalizationName}
-            onChange={(e) => updateShirt(index, "personalizationName", e.target.value)}
-            style={{ width: "100%", padding: "8px", marginTop: "8px" }}
-          />
-
-          <input
-            placeholder="Number on Shirt"
-            value={shirt.personalizationNumber}
-            onChange={(e) => updateShirt(index, "personalizationNumber", e.target.value)}
-            style={{ width: "100%", padding: "8px", marginTop: "8px" }}
-          />
-
-          <label>
-            <input
-              type="checkbox"
-              checked={shirt.personalizationWings}
-              onChange={(e) => updateShirt(index, "personalizationWings", e.target.checked)}
-            /> Add Angel Wings
-          </label>
-
-          <input
-            type="number"
-            value={shirt.quantity}
-            min="1"
-            onChange={(e) => updateShirt(index, "quantity", parseInt(e.target.value) || 1)}
-            style={{ width: "100%", padding: "8px", marginTop: "8px" }}
-          />
-
-        </div>
-      ))}
-
-      <button onClick={addShirt} style={{ width: "100%", padding: "12px" }}>
-        + Add Another Shirt
-      </button>
-
-      <h2>Total: ${total}</h2>
-
-      <button onClick={handleSubmit} style={{
-        width: "100%",
-        padding: "15px",
-        background: "black",
-        color: "white",
-        fontWeight: "bold"
-      }}>
-        Pay & Submit Order
-      </button>
-
-    </div>
-  );
-}
+</body>
+</html>
